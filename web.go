@@ -31,13 +31,16 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/gorilla/mux"
+	"gopkg.in/urfave/cli.v1"
+	"strings"
 )
 
 func HttpErrorAndLog(w http.ResponseWriter, r *http.Request, code int,
-	format string, v ...interface{}) {
+format string, v ...interface{}) {
 
 	error := fmt.Sprintf(format, v...)
 	logger.PrintWithRequest(r, error)
@@ -70,7 +73,57 @@ func (h IndexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	templatePage.Execute(w, model)
 }
 
+// Parse a spool definition.
+//
+// name:directory:prefix:recursive
+func parseSpool(spool string) {
+
+	var name string = ""
+	var directory string = ""
+	var prefix string = ""
+
+	parts := strings.Split(spool, ":")
+
+	switch len(parts) {
+	case 1:
+		directory = parts[0]
+		break
+	case 2:
+		directory = parts[0]
+		prefix = parts[1]
+	}
+
+	log.Println(parts)
+}
+
 func StartServer(config *Config) {
+
+	app := cli.NewApp()
+
+	var spool string
+
+	app.Flags = []cli.Flag{
+
+		cli.StringFlag{
+			Name: "spool",
+			Usage: "spool definition",
+			Destination: &spool,
+		},
+
+	}
+
+	app.Action = func(ctx *cli.Context) error {
+		parseSpool(spool)
+		log.Println(spool)
+		log.Println(ctx.Args())
+		return nil
+	}
+
+	app.Run(os.Args[1:])
+
+}
+
+func RunServer(config *Config) {
 
 	authenticator := NewAuthenticator(config)
 

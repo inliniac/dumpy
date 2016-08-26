@@ -42,8 +42,8 @@ import (
 )
 
 const (
-	DEFAULT_PORT              = 7000
-	DEFAULT_TLS_KEY_FILENAME  = "key.pem"
+	DEFAULT_PORT = 7000
+	DEFAULT_TLS_KEY_FILENAME = "key.pem"
 	DEFAULT_TLS_CERT_FILENAME = "cert.pem"
 )
 
@@ -57,16 +57,17 @@ type SpoolConfig struct {
 	Name      string `json:"name"`
 	Directory string `json:"directory"`
 	Prefix    string `json:"prefix"`
+	Recursive bool `json:"recursive`
 }
 
 type Config struct {
 	filename string
 	checksum []byte
 
-	Port   int               `json:"port"`
-	Tls    TlsConfig         `json:"tls"`
-	Spools []*SpoolConfig    `json:"spools"`
-	Users  map[string]string `json:"users"`
+	Port     int               `json:"port"`
+	Tls      TlsConfig         `json:"tls"`
+	Spools   []*SpoolConfig    `json:"spools"`
+	Users    map[string]string `json:"users"`
 }
 
 func NewConfig(filename string) *Config {
@@ -218,7 +219,7 @@ func (c *SpoolCommand) Remove(args []string) int {
 	for idx, spool := range c.config.Spools {
 		if spool.Name == spoolName {
 			c.config.Spools = append(c.config.Spools[:idx],
-				c.config.Spools[idx+1:]...)
+				c.config.Spools[idx + 1:]...)
 			break
 		}
 	}
